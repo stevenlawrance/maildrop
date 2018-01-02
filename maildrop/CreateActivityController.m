@@ -23,7 +23,7 @@
 #import "Email.h"
 #import "ZKSforce.h"
 #import "zkDescribeGlobalSObject.h"
-#import "ZKDescribeSObject_Additions.h"
+#import "ZKDescribeSObject_additions.h"
 #import "SObjectPermsWrapper.h"
 #import "Attachment.h"
 #import "Constants.h"
@@ -37,7 +37,7 @@
 
 @interface CreateActivityController ()
 - (void)saveCheckedWhats;
-@property (retain) ZKSforceClient *sforce;
+@property (nonatomic, retain) ZKSforceClient *sforce;
 @end
 
 @implementation ZKSObject (AccountNameHelper)
@@ -58,13 +58,6 @@
 @synthesize createContactAllowed, createLeadAllowed;
 @synthesize email, closedTaskStatus;
 @synthesize sforce, storeTaskStatusDefault;
-
-+ (void)initialize {
-	NSArray *keys = [NSArray arrayWithObjects:@"email", nil];
-    [self setKeys:keys triggerChangeNotificationsForDependentKey:@"emailSubject"];
-	keys = [NSArray arrayWithObjects:@"sforce", nil];
-	[self setKeys:keys triggerChangeNotificationsForDependentKey:@"whoSearchToolTip"];
-}
 
 - (id)init {
 	self = [super init];
@@ -107,7 +100,7 @@
 }
 
 - (ZKSObject *)selectedWhat {
-	int sel = [whatSearchResults selectedRow];
+	int sel = (int) [whatSearchResults selectedRow];
 	if (sel < 0) return nil;
 	return [[whatResultsTableSource results] objectAtIndex:sel];
 }
@@ -192,7 +185,7 @@
 	int descMax = [[[sforce describeSObject:@"Task"] fieldWithName:@"Description"] length];
 	if ([desc length] > descMax) {
 		NSAlert *a = [NSAlert alertWithMessageText:@"Email is too long" defaultButton:@"Truncate" alternateButton:@"Cancel" otherButton:nil
-			informativeTextWithFormat:@"Email body is %d characters long, which is longer than max allowed of %d by Salesforce.com, do you want to truncate the email body, or cancel creating it?", [desc length], descMax];
+			informativeTextWithFormat:@"Email body is %d characters long, which is longer than max allowed of %d by Salesforce.com, do you want to truncate the email body, or cancel creating it?", (UInt32) [desc length], descMax];
 		if (NSAlertDefaultReturn == [a runModal])
 			[task setFieldValue:[desc substringToIndex:descMax] field:@"Description"];
 		else
@@ -204,7 +197,7 @@
 		[pendingTaskWhoWhat setTaskId:[sr id]];
 		[NSApp stopModal];
 	} else { 
-		NSAlert * a = [NSAlert alertWithMessageText:@"Unable to create email" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:[sr message]];
+        NSAlert * a = [NSAlert alertWithMessageText:@"Unable to create email" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", [sr message]];
 		[a runModal];
 	}
 }
@@ -234,6 +227,11 @@
 	return [self canSearchWho] ? @"" : @"No access to Leads or Contacts, cannot search/set related to Who field";
 }
 
++ (NSSet*) keyPathsForValuesAffectingWhoSearchToolTip
+{
+    return [NSSet setWithObject:@"sforce"];
+}
+
 -(NSString *)whoFieldsForType:(NSString *)type {
 	static NSString *WHO_FIELDS = @"Id, Email, Name, FirstName, LastName";
 	static NSString *WHO_FIELDS_LEAD = @"Company";
@@ -261,7 +259,7 @@
 			[whoSearchController setSelectionIndex:0];
 	}
 	@catch (ZKSoapException *ex) {
-		NSAlert * a = [NSAlert alertWithMessageText:@"Search Failed" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:[ex reason]];
+        NSAlert * a = [NSAlert alertWithMessageText:@"Search Failed" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", [ex reason]];
 		[a runModal];
 	}
 }
@@ -308,7 +306,7 @@
 			[whatSearchResults selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 	}
 	@catch (ZKSoapException *ex) {
-		NSAlert * a = [NSAlert alertWithMessageText:@"Search Failed" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:[ex reason]];
+        NSAlert * a = [NSAlert alertWithMessageText:@"Search Failed" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", [ex reason]];
 		[a runModal];
 	}
 }
@@ -323,6 +321,11 @@
 
 - (void)setEmailSubject:(NSString *)aEmailSubject {
 	[email setSubject:aEmailSubject];
+}
+
++ (NSSet*) keyPathsForValuesAffectingEmailSubject
+{
+    return [NSSet setWithObject:@"email"];
 }
 
 - (void)setCurrentPropertiesFromEmail {
@@ -400,7 +403,7 @@
 		[whoSearchController setSelectionIndex:0];
 	} else {
 		NSAlert * a = [NSAlert alertWithMessageText:@"Create Failed" defaultButton:@"OK" alternateButton:nil otherButton:nil 
-							   informativeTextWithFormat:[NSString stringWithFormat:@"%@ : %@", [sr statusCode], [sr message]]];
+                          informativeTextWithFormat:@"%@", [NSString stringWithFormat:@"%@ : %@", [sr statusCode], [sr message]]];
 		[a runModal];
 	}
 }

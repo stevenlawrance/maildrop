@@ -22,7 +22,6 @@
 #import "Attachment.h"
 #import "Email.h"
 #import "zkSObject.h"
-#import "NSData-Base64Extensions.h"
 #import "WhoWhat.h"
 
 @implementation Attachment
@@ -37,7 +36,7 @@
 }
 
 - (void)dealloc {
-	[[NSFileManager defaultManager] removeFileAtPath:[[file absoluteURL] path] handler:nil];
+	[[NSFileManager defaultManager] removeItemAtPath:[[file absoluteURL] path] error:nil];
 	[salesforceId release];
 	[parentId release];
 	[name release];
@@ -53,7 +52,7 @@
 	[a setFieldValue:name field:@"Name"];
 	[a setFieldValue:mimeType field:@"ContentType"];
 	NSData *d = [[NSData alloc] initWithContentsOfURL:file];
-	[a setFieldValue:[d encodeBase64] field:@"Body"];
+    [a setFieldValue:[d base64EncodedStringWithOptions:0] field:@"Body"];
 	[d release];
 	return a;
 }
@@ -62,15 +61,19 @@
 	return parentId != nil ? parentId : [parentWhoWhat salesforceId];
 }
 
+-(void)setParentId:(NSString *)newParentId {
+    parentId = newParentId;
+}
+
 -(NSString *)uniqueId {
 	return uniqueId;
 }
 
 -(NSString *)formattedSize {
-	NSDictionary *p = [[NSFileManager defaultManager] fileAttributesAtPath:[[file absoluteURL] path] traverseLink:YES];
+    NSDictionary *p = [[NSFileManager defaultManager] attributesOfItemAtPath:[[[file absoluteURL] path] stringByResolvingSymlinksInPath] error:nil];
 	long sz = [[p objectForKey:NSFileSize] longValue];
 	if (sz < 1024)
-		return [NSString stringWithFormat:@"%d bytes", sz];
+		return [NSString stringWithFormat:@"%ld bytes", sz];
 	if (sz < (1024 * 1024))
 		return [NSString stringWithFormat:@"%2.1f Kb", (sz / 1024.0f)];
 	return [NSString stringWithFormat:@"%2.1f Mb", (sz / (1024.0f * 1024))];

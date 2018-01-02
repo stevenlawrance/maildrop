@@ -28,14 +28,6 @@
 
 @synthesize sobject;
 
-+ (void)initialize {
-	NSArray *keys = [NSArray arrayWithObjects:@"sobject", nil];
-    [self setKeys:keys triggerChangeNotificationsForDependentKey:@"salesforceId"];
-    [self setKeys:keys triggerChangeNotificationsForDependentKey:@"name"];
-    [self setKeys:keys triggerChangeNotificationsForDependentKey:@"type"];
-    [self setKeys:keys triggerChangeNotificationsForDependentKey:@"displayName"];
-}
-
 -(id)initWithClient:(ZKSforceClient *)c {
 	self = [super init];
 	client = [c retain];
@@ -56,6 +48,11 @@
 	return [sobject id];
 }
 
++ (NSSet*) keyPathsForValuesAffectingSalesforceId
+{
+    return [NSSet setWithObject:@"sobject"];
+}
+
 -(NSString *)name {
 	NSString *tn = [sobject type];
 	NSString *nf;
@@ -66,12 +63,27 @@
 	return [sobject fieldValue:nf];
 }
 
++ (NSSet*) keyPathsForValuesAffectingName
+{
+    return [NSSet setWithObject:@"sobject"];
+}
+
 -(NSString *)type {
 	return [[self describe] label];
 }
 
++ (NSSet*) keyPathsForValuesAffectingType
+{
+    return [NSSet setWithObject:@"sobject"];
+}
+
 -(NSString *)displayName {
 	return [NSString stringWithFormat:@"%@ (%@)", [self name], [self type]];
+}
+
++ (NSSet*) keyPathsForValuesAffectingDisplayName
+{
+    return [NSSet setWithObject:@"sobject"];
 }
 
 @end

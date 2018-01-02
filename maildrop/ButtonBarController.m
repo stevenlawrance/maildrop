@@ -143,7 +143,7 @@ static const CGFloat WINDOW_HEIGHT_PROGRESS = 35.0f;
 }
 
 -(IBAction)toggleClient:(id)sender {
-	int curIdx = [clientApps indexOfObject:selectedClient];
+	int curIdx = (int) [clientApps indexOfObject:selectedClient];
 	int newIdx = (curIdx + 1) % [clientApps count];
 	[self setSelectedClient:[clientApps objectAtIndex:newIdx]];
 }
@@ -228,7 +228,7 @@ static const CGFloat WINDOW_HEIGHT_PROGRESS = 35.0f;
 		}
 	}
 	NSAlert *a = [NSAlert alertWithMessageText:[NSString stringWithFormat:@"Error %@ apple script", operation] 
-	defaultButton:@"Close" alternateButton:nil otherButton:nil informativeTextWithFormat:[NSString stringWithFormat:@"script %@\r\nerror %@", source, err]];
+	defaultButton:@"Close" alternateButton:nil otherButton:nil informativeTextWithFormat:@"script %@\r\nerror %@", source, err];
 	[a runModal];
 }
 

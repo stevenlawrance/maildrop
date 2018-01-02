@@ -20,8 +20,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "ZKSObject.h"
-#import "ZKDescribeSObject.h"
+#import "zkSObject.h"
+#import "zkDescribeSObject.h"
 #import "zkSforceClient.h"
 
 @class ZKSforceClient;

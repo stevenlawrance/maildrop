@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ZkHelpBaseUrl</key>
-	<string>http://www.pocketsoap.com/osx/maildrop/help/</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.5.0</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
@@ -13,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>maildrop.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.pocketsoap.maildrop</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -23,18 +19,22 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>2.93</string>
+	<string>2.991</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
+	<key>NSAppleScriptEnabled</key>
+	<string>YES</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>NSAppleScriptEnabled</key>
-	<string>YES</string>
 	<key>OSAScriptingDefinition</key>
 	<string>maildrop.sdef</string>
-	<key>SUFeedURL</key>
-	<string>http://www.pocketsoap.com/osx/maildrop/maildrop.xml</string>
 	<key>SUCheckAtStartup</key>
 	<false/>
+	<key>SUFeedURL</key>
+	<string>http://www.pocketsoap.com/osx/maildrop/maildrop.xml</string>
+	<key>ZkHelpBaseUrl</key>
+	<string>http://www.pocketsoap.com/osx/maildrop/help/</string>
 </dict>
 </plist>

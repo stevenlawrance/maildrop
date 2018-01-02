@@ -21,10 +21,11 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import <AppKit/NSTableView.h>
 
 @class ZKSforceClient;
 
-@interface WhatSearchDataSource : NSObject {
+@interface WhatSearchDataSource : NSObject<NSTableViewDataSource> {
 	NSArray 		*results;
 	ZKSforceClient 	*sforce;
 }

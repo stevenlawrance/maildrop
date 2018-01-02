@@ -51,14 +51,6 @@ typedef enum GrowlNotification {
 
 - (void)dealloc {
 	[attachments release];
-	[fromAddr release];
-	[fromName release];
-	[toAddr release];
-	[toName release];
-	[subject release];
-	[body release];
-	[date release];
-	[salesforceId release];
 	[super dealloc];
 }
 
@@ -80,8 +72,9 @@ typedef enum GrowlNotification {
 	NSMutableString *detail = [NSMutableString stringWithString:[[sforce describeSObject:sobject] urlDetail]];
 	[detail replaceOccurrencesOfString:@"{ID}" withString:sfId options:NSLiteralSearch range:NSMakeRange(0, [detail length])];
 	NSURL *detailUrl = [NSURL URLWithString:detail];
-	NSURL *baseUiUrl = [NSURL URLWithString:@"/" relativeToURL:detailUrl];		
-	NSURL *frontdoor = [NSURL URLWithString:[NSString stringWithFormat:@"/secur/frontdoor.jsp?sid=%@&retURL=%@", [[[NSApp delegate] sforce] sessionId], [detailUrl path]] relativeToURL:baseUiUrl];
+	NSURL *baseUiUrl = [NSURL URLWithString:@"/" relativeToURL:detailUrl];
+    AppDelegate *appDelegate = (AppDelegate *)[NSApp delegate];
+	NSURL *frontdoor = [NSURL URLWithString:[NSString stringWithFormat:@"/secur/frontdoor.jsp?sid=%@&retURL=%@", [[appDelegate sforce] sessionId], [detailUrl path]] relativeToURL:baseUiUrl];
 	[[NSWorkspace sharedWorkspace] openURL:frontdoor];
 }
 
@@ -145,6 +138,7 @@ typedef enum GrowlNotification {
 	int num = [self countOfAttachmentsToUpload];
 	if (activityId != nil) {
 		[self setSalesforceId:activityId];
+        [self setAttachmentsParentId:activityId onlyIfNil:NO];
 		[self saveAttachmentsUsingClient:[app sforce] numTotal:num];
 		[self growl:EmailAdded];
 		if ([[NSUserDefaults standardUserDefaults] boolForKey:SHOW_NEW_EMAIL_PREF])
@@ -189,7 +183,7 @@ typedef enum GrowlNotification {
 		if ([[NSUserDefaults standardUserDefaults] boolForKey:SHOW_NEW_CASE_PREF])
 			[self openInSalesforce:salesforceId sobject:@"Case" sforce:sforce];
 	} else {
-		NSAlert * a = [NSAlert alertWithMessageText:[sr message] defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:[sr statusCode]];
+        NSAlert * a = [NSAlert alertWithMessageText:[sr message] defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", [sr statusCode]];
 		[a runModal];
 	}
 }

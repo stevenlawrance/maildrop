@@ -29,12 +29,6 @@
 
 static NSString * login_lastUsernameKey = @"login_lastUserName";
 
-+ (void)initialize {
-	[self setKeys:[NSArray arrayWithObject:@"server"]   triggerChangeNotificationsForDependentKey:@"credentials"];
-	[self setKeys:[NSArray arrayWithObject:@"server"]   triggerChangeNotificationsForDependentKey:@"canDeleteServer"];
-	[self setKeys:[NSArray arrayWithObject:@"username"] triggerChangeNotificationsForDependentKey:@"password"];
-}
-
 - (id)init {
 	self = [super init];
 	server = [[[NSUserDefaults standardUserDefaults] objectForKey:@"server"] copy];
@@ -115,11 +109,16 @@ static NSString * login_lastUsernameKey = @"login_lastUserName";
 	}
 }
 
-static NSString *prod = @"https://www.salesforce.com";
+static NSString *prod = @"https://login.salesforce.com";
 static NSString *test = @"https://test.salesforce.com";
 
 - (BOOL)canDeleteServer {
 	return ([server caseInsensitiveCompare:prod] != NSOrderedSame) && ([server caseInsensitiveCompare:test] != NSOrderedSame);
+}
+
++ (NSSet*) keyPathsForValuesAffectingCanDeleteServer
+{
+    return [NSSet setWithObject:@"server"];
 }
 
 // this will show a new window, handling the fact that the original login window may of been a stand alone window, or already be a sheet.
@@ -199,7 +198,7 @@ static NSString *test = @"https://test.salesforce.com";
 			additionalText:(NSString *)additionalText 
 			didEndSelector:(SEL)didEndSelector
 			contextInfo:(id)context {
-	NSAlert * a = [NSAlert alertWithMessageText:message defaultButton:defaultButton alternateButton:altButton otherButton:otherButton informativeTextWithFormat:additionalText];
+    NSAlert * a = [NSAlert alertWithMessageText:message defaultButton:defaultButton alternateButton:altButton otherButton:otherButton informativeTextWithFormat:@"%@", additionalText];
 	NSWindow *wndForAlertSheet = modalWindow == nil ? window : modalWindow;
 	if (modalWindow != nil) {
 		[NSApp endSheet:window];
@@ -366,6 +365,11 @@ static NSString *test = @"https://test.salesforce.com";
 	return credentials;
 }
 
++ (NSSet*) keyPathsForValuesAffectingCredentials
+{
+    return [NSSet setWithObject:@"server"];
+}
+
 - (NSString *)server {
 	return server;
 }
@@ -403,6 +407,11 @@ static NSString *test = @"https://test.salesforce.com";
 	aPassword = [aPassword copy];
 	[password release];
 	password = aPassword;
+}
+
++ (NSSet*) keyPathsForValuesAffectingPassword
+{
+    return [NSSet setWithObject:@"username"];
 }
 
 - (NSString *)username {

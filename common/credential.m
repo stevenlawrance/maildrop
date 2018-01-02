@@ -35,7 +35,7 @@
 	SecProtocolType protocol = [url SecProtocolType];
 	
 	NSMutableArray *results = [NSMutableArray array];
-	SecKeychainAttribute att[] = { {kSecServerItemAttr, [server length], (void *)[server UTF8String] }, 
+	SecKeychainAttribute att[] = { {kSecServerItemAttr, (UInt32) [server length], (void *)[server UTF8String] },
 								   {kSecProtocolItemAttr, sizeof(SecProtocolType), &protocol } }; 
 	SecKeychainAttributeList attList = { 2, att };
 	SecKeychainItemRef itemRef;
@@ -48,7 +48,7 @@
 			SecKeychainAttributeList al = { 1, a };
 			OSStatus s2 = SecKeychainItemCopyContent(itemRef, NULL, &al, 0, NULL);
 			if (noErr == s2) {
-				NSString *un = [NSString stringWithCString:a[0].data length:a[0].length];
+				NSString *un = [NSString stringWithCString:a[0].data encoding:NSUTF8StringEncoding];
 				[results addObject:[Credential forServer:protocolAndServer username:un keychainItem:itemRef]];
 				SecKeychainItemFreeContent(&al, NULL);
 			} else {
@@ -83,15 +83,16 @@
 	SecKeychainItemRef itemRef;
 	OSStatus status = SecKeychainAddInternetPassword (
 								NULL,
-								[server cStringLength], [server cString],
+                                (UInt32) [server lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+                                [server cStringUsingEncoding:NSUTF8StringEncoding],
 								0, NULL,
-								[un lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+								(UInt32) [un lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
 								[un cStringUsingEncoding:NSUTF8StringEncoding],
 								0, NULL,
 								0,
 								[url SecProtocolType],
 								kSecAuthenticationTypeDefault,
-								[pwd lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+								(UInt32) [pwd lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
 								[pwd cStringUsingEncoding:NSUTF8StringEncoding],
 								&itemRef);
 	if (status != noErr) {
@@ -135,7 +136,7 @@
 	void *data = 0;
 	NSString *pwd = nil;
 	if (noErr == SecKeychainItemCopyContent(keychainItem, NULL, &al, &length, &data)) {
-		pwd = [NSString stringWithCString:data length:length];
+        pwd = [NSString stringWithCString:data encoding:NSUTF8StringEncoding];
 	}
 	SecKeychainItemFreeContent(&al, data);
 	return pwd;
@@ -216,12 +217,12 @@ BOOL checkAccessToAcl(SecACLRef acl, NSData *thisAppHash) {
 - (OSStatus)setKeychainAttribute:(SecItemAttr)attribute newValue:(NSString *)val newPassword:(NSString *)password {
 	// Set up attribute vector (each attribute consists of {tag, length, pointer}):
 	SecKeychainAttribute attrs[] = {
-			{ attribute, [val lengthOfBytesUsingEncoding:NSUTF8StringEncoding], (char *)[val cStringUsingEncoding:NSUTF8StringEncoding] } };
+			{ attribute, (UInt32) [val lengthOfBytesUsingEncoding:NSUTF8StringEncoding], (char *)[val cStringUsingEncoding:NSUTF8StringEncoding] } };
 	const SecKeychainAttributeList attributes = { sizeof(attrs) / sizeof(attrs[0]),  attrs };
 	OSStatus status = SecKeychainItemModifyAttributesAndData (
 									keychainItem,   // the item reference
 									&attributes,    // no change to attributes
-									[password lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+									(UInt32) [password lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
 									[password cStringUsingEncoding:NSUTF8StringEncoding] );
 	if (status != noErr) 
 		NSLog(@"SecKeychainItemModifyAttributesAndData returned %d", status);
@@ -234,7 +235,7 @@ BOOL checkAccessToAcl(SecACLRef acl, NSData *thisAppHash) {
 	SecProtocolType protocol = [url SecProtocolType];
 	
 	// Set up attribute vector (each attribute consists of {tag, length, pointer}):
-	SecKeychainAttribute attrs[] = { {kSecServerItemAttr, [host length], (void *)[host UTF8String] }, 
+	SecKeychainAttribute attrs[] = { {kSecServerItemAttr, (UInt32) [host length], (void *)[host UTF8String] }, 
 							  	     {kSecProtocolItemAttr, sizeof(SecProtocolType), &protocol } };
 								
 	const SecKeychainAttributeList attributes = { sizeof(attrs) / sizeof(attrs[0]),  attrs };
@@ -272,7 +273,7 @@ BOOL checkAccessToAcl(SecACLRef acl, NSData *thisAppHash) {
 	SecKeychainAttributeList al = { 1, a };
 	NSString *comment = nil;
 	if (noErr == SecKeychainItemCopyContent(keychainItem, NULL, &al, nil, nil)) {
-		comment = [NSString stringWithCString:a[0].data length:a[0].length];
+        comment = [NSString stringWithCString:a[0].data encoding:NSUTF8StringEncoding];
 	}
 	SecKeychainItemFreeContent(&al, nil);
 	return comment;

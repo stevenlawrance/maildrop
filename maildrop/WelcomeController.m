@@ -81,7 +81,7 @@
 - (void)ensureDirectoryExists:(NSString *)dir {
 	if (![[NSFileManager defaultManager] fileExistsAtPath:dir]) {
 		[self ensureDirectoryExists:[dir stringByDeletingLastPathComponent]];
-		[[NSFileManager defaultManager] createDirectoryAtPath:dir attributes:nil];	
+        [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:true attributes:nil error:nil];
 	}
 }
 
@@ -106,8 +106,8 @@
 		NSString *dstFile = [destDir stringByAppendingPathComponent:[srcFile lastPathComponent]];
 		[self ensureDirectoryExists:destDir];
 		if ([[NSFileManager defaultManager] fileExistsAtPath:dstFile])
-			[[NSFileManager defaultManager] removeFileAtPath:dstFile handler:self];
-		if(![[NSFileManager defaultManager] copyPath:srcFile toPath:dstFile handler:self])
+            [[NSFileManager defaultManager] removeItemAtPath:dstFile error:nil];
+        if(![[NSFileManager defaultManager] copyItemAtPath:srcFile toPath:dstFile error:nil])
 			NSLog(@"Failed on copy of %@ to %@", srcFile, dstFile);
 		[installList removeLastObject];
 		[self setInstallProgress:progress+1];

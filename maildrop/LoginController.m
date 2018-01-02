@@ -20,7 +20,7 @@
 //
 
 #import "LoginController.h"
-#import "ZKSforceClient.h"
+#import "zkSforceClient.h"
 #import "../common/ZKLoginController.h"
 #import "AppDelegate.h"
 
@@ -54,8 +54,10 @@
 	ZKSforceClient *sf = [login showModalLoginWindow:sender];
 	[self setSforce:sf];
 	[login release];
-	if (sf != nil)
-		[[NSApp delegate] showButtonBar:sender];
+    if (sf != nil) {
+        AppDelegate *appDelegate = (AppDelegate *)[NSApp delegate];
+		[appDelegate showButtonBar:sender];
+    }
 }
 
 - (BOOL)loggedIn {
